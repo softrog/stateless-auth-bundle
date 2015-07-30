@@ -1,0 +1,15 @@
+{
+    "name": "softrog/stateless-auth-bundle",
+    "description": "Symfony bundle to inject and validate stateless authorization for http requests.",
+    "authors": [
+        {
+            "name": "Roger Torrente",
+            "email": "roger.torrente@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "": "src/" }
+    },
+    "minimum-stability": "dev",
+    "require": {}
+}
