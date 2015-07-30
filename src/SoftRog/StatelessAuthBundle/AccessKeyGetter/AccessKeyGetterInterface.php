@@ -1,8 +1,8 @@
 <?php
 
-namespace SoftRog\StatelessAuthBundle\Authentication;
+namespace SoftRog\StatelessAuthBundle\AccessKeyGetter;
 
-interface KeyGetterInterface
+interface AccessKeyGetterInterface
 {
   /**
    * Get accessKey

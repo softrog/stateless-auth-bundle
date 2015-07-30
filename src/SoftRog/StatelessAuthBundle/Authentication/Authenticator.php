@@ -5,7 +5,6 @@ namespace SoftRog\StatelessAuthBundle\Authentication;
 use Mardy\Hmac\Manager;
 use Mardy\Hmac\Adapters\Hash;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
@@ -25,16 +24,58 @@ class Authenticator implements ContainerAwareInterface
   {
     $this->container = $container;
 
-    $keyGetterClass = $container->getParameter('stateless_auth.key_getter_class');
-    $this->keyGetter = new $keyGetterClass();
+    if ($container->hasParameter('stateless_auth.key_getter_class')) {
+      $keyGetterClass = $container->getParameter('stateless_auth.key_getter_class');
+      $this->keyGetter = new $keyGetterClass();
 
-    if ($this->keyGetter instanceof ContainerAwareInterface) {
-      $this->keyGetter->setContainer($container);
+      if ($this->keyGetter instanceof ContainerAwareInterface) {
+        $this->keyGetter->setContainer($container);
+      }
     }
+  }
+
+  public function create($headers)
+  {
+    if (!$this->container->hasParameter('stateless_auth.id') || !$this->container->hasParameter('stateless_auth.key')) {
+      throw new \SoftRog\StatelessAuthBundle\Exception\InvalidStatelessAuthCredentialsException();
+    }
+
+    $this->initManager($this->container->getParameter('stateless_auth.algorithm'));
+
+    $data = "";
+    $signedHeaders = $this->container->getParameter('stateless_auth.signed_headers');
+    foreach (explode(';', $signedHeaders) as $signedHeader) {
+      $data .= is_array($headers[$signedHeader])? implode(';', $headers[$signedHeader]) : $headers[$signedHeader];
+    }
+
+    $time = time();
+
+//    $this->manager->ttl($this->container->getParameter('stateless_auth.ttl'));
+    $this->manager->key($this->container->getParameter('stateless_auth.key'));
+    $this->manager->data($data);
+    $this->manager->time($time);
+    $this->manager->encode();
+
+    $hmac = $this->manager->toArray();
+
+    if ($hmac != null) {
+      return sprintf('HMAC-%s Credential=%s/%s, SignedHeaders=%s, Signature=%s',
+              strtoupper($this->container->getParameter('stateless_auth.algorithm')),
+              $this->container->getParameter('stateless_auth.id'),
+              $time,
+              $signedHeaders,
+              $hmac['hmac']
+      );
+    }
+
+    return false;
   }
 
   public function validate()
   {
+    if (!$this->keyGetter instanceof \SoftRog\StatelessAuthBundle\AccessKeyGetter\AccessKeyGetterInterface) {
+      throw new \SoftRog\StatelessAuthBundle\AccessKeyGetter\Exception\InvalidAccessKeyGetterException();
+    }
 
     $header = $this->getRequest()->headers->get('Authorization');
 

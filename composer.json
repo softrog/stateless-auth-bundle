@@ -11,5 +11,9 @@
         "psr-4": { "": "src/" }
     },
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "doctrine/orm": "~2.2,>=2.2.3,<2.5",
+        "doctrine/dbal": "<2.5",
+        "gedmo/doctrine-extensions": "2.3.12"
+    }
 }
