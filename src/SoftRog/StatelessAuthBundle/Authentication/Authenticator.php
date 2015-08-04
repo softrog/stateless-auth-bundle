@@ -34,43 +34,6 @@ class Authenticator implements ContainerAwareInterface
     }
   }
 
-  public function create($headers)
-  {
-    if (!$this->container->hasParameter('stateless_auth.id') || !$this->container->hasParameter('stateless_auth.key')) {
-      throw new \SoftRog\StatelessAuthBundle\Exception\InvalidStatelessAuthCredentialsException();
-    }
-
-    $this->initManager($this->container->getParameter('stateless_auth.algorithm'));
-
-    $data = "";
-    $signedHeaders = $this->container->getParameter('stateless_auth.signed_headers');
-    foreach (explode(';', $signedHeaders) as $signedHeader) {
-      $data .= is_array($headers[$signedHeader])? implode(';', $headers[$signedHeader]) : $headers[$signedHeader];
-    }
-
-    $time = time();
-
-//    $this->manager->ttl($this->container->getParameter('stateless_auth.ttl'));
-    $this->manager->key($this->container->getParameter('stateless_auth.key'));
-    $this->manager->data($data);
-    $this->manager->time($time);
-    $this->manager->encode();
-
-    $hmac = $this->manager->toArray();
-
-    if ($hmac != null) {
-      return sprintf('HMAC-%s Credential=%s/%s, SignedHeaders=%s, Signature=%s',
-              strtoupper($this->container->getParameter('stateless_auth.algorithm')),
-              $this->container->getParameter('stateless_auth.id'),
-              $time,
-              $signedHeaders,
-              $hmac['hmac']
-      );
-    }
-
-    return false;
-  }
-
   public function validate()
   {
     if (!$this->keyGetter instanceof \SoftRog\StatelessAuthBundle\AccessKeyGetter\AccessKeyGetterInterface) {
@@ -93,7 +56,7 @@ class Authenticator implements ContainerAwareInterface
       $time = $matches['time'];
       $hmac = $matches['signature'];
 
-      $this->initManager($algorithm);
+      $this->reset($algorithm);
       $this->manager->ttl($this->container->getParameter('stateless_auth.ttl'));
       $this->manager->key($key);
       $this->manager->data($data);
@@ -117,7 +80,7 @@ class Authenticator implements ContainerAwareInterface
     return $this->container->get('request_stack')->getCurrentRequest();
   }
 
-  private function initManager($algorithm)
+  private function reset($algorithm)
   {
     $config = [
         'algorithm' => $algorithm,

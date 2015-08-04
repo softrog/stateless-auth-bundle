@@ -1,4 +1,9 @@
 services:
+    stateless_auth.generator:
+        class: SoftRog\StatelessAuthBundle\Authentication\Generator
+        calls:
+            - [setContainer, ["@service_container"]]
+
     stateless_auth.authenticator:
         class: SoftRog\StatelessAuthBundle\Authentication\Authenticator
         calls:

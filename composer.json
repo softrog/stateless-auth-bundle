@@ -12,8 +12,6 @@
     },
     "minimum-stability": "dev",
     "require": {
-        "doctrine/orm": "~2.2,>=2.2.3,<2.5",
-        "doctrine/dbal": "<2.5",
-        "gedmo/doctrine-extensions": "2.3.12"
+        "mardy-git/hmac": "^2.3"
     }
 }
