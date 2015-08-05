@@ -1,16 +1,11 @@
 services:
-    stateless_auth.generator:
-        class: SoftRog\StatelessAuthBundle\Authentication\Generator
-        calls:
-            - [setContainer, ["@service_container"]]
-
-    stateless_auth.authenticator:
-        class: SoftRog\StatelessAuthBundle\Authentication\Authenticator
-        calls:
-            - [setContainer, ["@service_container"]]
 
     stateless_auth.annotation:
         class: SoftRog\StatelessAuthBundle\Annotations\Driver\AnnotationDriver
-        tags: [{name: kernel.event_listener, event: kernel.controller, method: onKernelController}]
-        arguments: [@annotation_reader, "@stateless_auth.authenticator"]
+        arguments: [@annotation_reader]
+        calls:
+            - [setValidator, [@stateless_auth.validator]]
+            - [setRequestStack, [@request_stack]]
+        tags:
+            - {name: kernel.event_listener, event: kernel.controller, method: onKernelController}
 

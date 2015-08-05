@@ -7,11 +7,17 @@
             "email": "roger.torrente@gmail.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@bitbucket.org:softrog/stateless-auth.git"
+        }
+    ],
     "autoload": {
         "psr-4": { "": "src/" }
     },
     "minimum-stability": "dev",
     "require": {
-        "mardy-git/hmac": "^2.3"
+        "softrog/stateless-auth": "dev-master"
     }
 }

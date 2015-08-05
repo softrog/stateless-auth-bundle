@@ -6,7 +6,8 @@ use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\RequestStack;
-use SoftRog\StatelessAuthBundle\Authentication\Authenticator;
+use SoftRog\StatelessAuth\Authentication;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class AnnotationDriver
 {
@@ -16,16 +17,20 @@ class AnnotationDriver
   /** @var Reader */
   private $reader;
 
-  /** @var Authenticator */
-  private $authenticator;
+  /** @var Authentication\Validator */
+  private $validator;
 
   /** @var RequestStack */
   private $requestStack;
 
-  public function __construct(Reader $reader, Authenticator $authenticator)
+  public function __construct(Reader $reader)
   {
     $this->reader = $reader;
-    $this->authenticator = $authenticator;
+  }
+
+  public function setValidator(Authentication\Validator $validator)
+  {
+    $this->validator = $validator;
   }
 
   public function setRequestStack(RequestStack $requestStack)
@@ -50,8 +55,12 @@ class AnnotationDriver
   protected function handleStatelessAuth($class)
   {
     $annotation = $this->reader->getClassAnnotation($class, self::STATE_LESS_ANNOTATION);
-    //echo $this->authenticator->create(); exit;
-    if ($annotation && !$this->authenticator->validate()) {
+
+    $request = $this->requestStack->getCurrentRequest();
+    $headers = $request->headers->all();
+    $token = $request->headers->get('Authorization');
+
+    if ($annotation && !$this->validator->validate($token, $headers)) {
       throw new AccessDeniedHttpException('Invalid authentication');
     }
 

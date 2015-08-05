@@ -1,0 +1,97 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "c2406f9ba071a0e0eb8838827f100732",
+    "packages": [
+        {
+            "name": "mardy-git/hmac",
+            "version": "v2.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mardy-git/hmac.git",
+                "reference": "f3a95bd199e37c3b79eb586239cb4a5d8857a10d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mardy-git/hmac/zipball/f3a95bd199e37c3b79eb586239cb4a5d8857a10d",
+                "reference": "f3a95bd199e37c3b79eb586239cb4a5d8857a10d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.5.0"
+            },
+            "suggest": {
+                "guzzlehttp/guzzle": "This is required to use the HmacHeadersGuzzlePlugin. The plugin will auto inject your HMAC headers into a HTTP request using Guzzle 4+"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Mardy\\Hmac": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "WTFPL"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Bardsley",
+                    "email": "me@mic-b.co.uk"
+                }
+            ],
+            "description": "A keyed-Hash Message Authentication Code (HMAC). Used for application to application authentication.",
+            "homepage": "http://github.com/mardy-git/hmac",
+            "keywords": [
+                "Authentication",
+                "bcrypt",
+                "guzzle-plugin",
+                "hash",
+                "hmac",
+                "pbkdf2"
+            ],
+            "time": "2015-04-30 20:41:58"
+        },
+        {
+            "name": "softrog/stateless-auth",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "git@bitbucket.org:softrog/stateless-auth.git",
+                "reference": "be7693e79435c0d8fe4f062248ef70c592cfc27d"
+            },
+            "require": {
+                "mardy-git/hmac": "^2.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "": "src/"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Roger Torrente",
+                    "email": "roger.torrente@gmail.com"
+                }
+            ],
+            "description": "Stateless authorization for REST apis.",
+            "time": "2015-08-05 18:34:44"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "softrog/stateless-auth": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}
