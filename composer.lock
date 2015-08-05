@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c2406f9ba071a0e0eb8838827f100732",
+    "hash": "b0473f66abcc938c5f5372ded59e8f86",
     "packages": [
         {
             "name": "mardy-git/hmac",
@@ -59,11 +59,11 @@
         },
         {
             "name": "softrog/stateless-auth",
-            "version": "dev-master",
+            "version": "v0.1.0",
             "source": {
                 "type": "git",
                 "url": "git@bitbucket.org:softrog/stateless-auth.git",
-                "reference": "be7693e79435c0d8fe4f062248ef70c592cfc27d"
+                "reference": "6c819a88e2c0a5ed44a9d4b7a5076fa3f85701a5"
             },
             "require": {
                 "mardy-git/hmac": "^2.3"
@@ -81,15 +81,13 @@
                 }
             ],
             "description": "Stateless authorization for REST apis.",
-            "time": "2015-08-05 18:34:44"
+            "time": "2015-08-05 23:46:19"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "softrog/stateless-auth": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

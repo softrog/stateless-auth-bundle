@@ -7,8 +7,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Mardy\Hmac\Manager;
-use Mardy\Hmac\Adapters\Hash;
+use SoftRog\StatelessAuth\Authentication\Generator;
 
 class AuthCommand extends ContainerAwareCommand
 {
@@ -16,52 +15,63 @@ class AuthCommand extends ContainerAwareCommand
   protected function configure()
   {
     $this
-            ->setName('auth:generate:token')
-            ->setAliases(['generate:auth:token'])
-            ->setDescription('Generates a valid auth hmac token')
-            ->addArgument('id', InputArgument::REQUIRED)
-            ->addArgument('key', InputArgument::REQUIRED)
-            ->addArgument('signer_headers', InputArgument::REQUIRED, 'The headers that will be used (e.g. "host;user-agent"')
-            ->addArgument('data', InputArgument::REQUIRED, 'The resulting data of concatenating the signed headers')
-            ->addOption('algorithm', 'a', InputArgument::OPTIONAL, '', 'sha256')
-            ->addOption('num-first-iterations', 'f', InputOption::VALUE_OPTIONAL, '', 10)
-            ->addOption('num-second-iterations', 'd', InputOption::VALUE_OPTIONAL, '', 10)
-            ->addOption('num-final-iterations', 'l', InputOption::VALUE_OPTIONAL, '', 100)
+      ->setName('auth:generate:token')
+      ->setAliases(['generate:auth:token'])
+      ->setDescription('Generates a valid auth hmac token')
+      ->addArgument('accessKeyId', InputArgument::REQUIRED)
+      ->addArgument('accessKey', InputArgument::OPTIONAL)
+      ->addOption('headers', 'H', InputOption::VALUE_OPTIONAL,
+        'The headers that will be used in json',
+        sprintf('{\'host\':\'%s\'}', gethostname())
+      )
+      ->addOption('algorithm', 'a', InputArgument::OPTIONAL, '', 'sha256')
+      ->addOption('num-first-iterations', 'f', InputOption::VALUE_OPTIONAL, '', 10)
+      ->addOption('num-second-iterations', 'd', InputOption::VALUE_OPTIONAL, '', 10)
+      ->addOption('num-final-iterations', 'l', InputOption::VALUE_OPTIONAL, '', 100)
     ;
   }
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $config = [
-        'algorithm' => $input->getOption('algorithm'),
-        'num-first-iterations' => $input->getOption('num-first-iterations'),
-        'num-second-iterations' => $input->getOption('num-second-iterations'),
-        'num-final-iterations' => $input->getOption('num-final-iterations')
-    ];
+    $headers = json_decode($input->getOption('headers'), true);
 
-    $time = time();
-    $this->manager = new Manager(new Hash);
-    $this->manager->config($config);
-    $this->manager->key($input->getArgument('key'));
-    $this->manager->data($input->getArgument('data'));
-    $this->manager->time($time);
-    $this->manager->encode();
-
-    $hmac = $this->manager->toArray();
-
-    if ($hmac != null) {
-      $output->writeln(sprintf('HMAC-%s Credential=%s/%s, SignedHeaders=%s, Signature=%s',
-        strtoupper($input->getOption('algorithm')),
-        $input->getArgument('id'),
-        $time,
-        $input->getArgument('signer_headers'),
-        $hmac['hmac']
-      ));
-
-      return true;
+    if (empty($headers)) {
+      $message = sprintf('Invalid json format for headers (\'%s\')', $input->getArgument('headers'));
+      throw new \Exception($message);
     }
 
-    throw new \Exception('Error generating the token, make sure that all data is set correctly.');
+    if (empty($input->getArgument('accessKey'))) {
+      $accessKey = $this->findAccessKey($input->getArgument('accessKeyId'));
+    } else {
+      $accessKey = $input->getArgument('accessKey');
+    }
+
+    $config = [
+        'id' => $input->getArgument('accessKeyId'),
+        'key' => $accessKey,
+        'algorithm' => $input->getOption('algorithm'),
+        'num_first_iterations' => $input->getOption('num-first-iterations'),
+        'num_second_iterations' => $input->getOption('num-second-iterations'),
+        'num_final_iterations' => $input->getOption('num-final-iterations'),
+        'signed_headers' => implode(';', array_keys($headers)),
+    ];
+
+    $generator = new Generator($config);
+    $output->writeln(sprintf('<info>%s</info>', $generator->generate($headers)));
+  }
+
+  protected function findAccessKey($accessKeyId)
+  {
+    $getter = $this->getContainer()->get('stateless_auth.access_key_getter');
+    $accessKey = $getter->get($accessKeyId);
+
+    if (empty($accessKey)) {
+      throw new \Exception(
+          sprintf('Impossible to find accessKey for accessKeyId \'%s\'', $accessKeyId)
+      );
+    }
+
+    return $accessKey;
   }
 
 }

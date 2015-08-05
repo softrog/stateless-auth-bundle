@@ -25,7 +25,6 @@ class Configuration implements ConfigurationInterface
       ->children()
         ->scalarNode('id')->end()
         ->scalarNode('key')->end()
-        ->scalarNode('key_getter_class')->end()
         ->scalarNode('signed_headers')->defaultValue('Host')->end()
         ->enumNode('algorithm')->values(['sha1', 'md5', 'sha256'])->defaultValue('sha256')->end()
         ->integerNode('ttl')->defaultValue(300)->end()
