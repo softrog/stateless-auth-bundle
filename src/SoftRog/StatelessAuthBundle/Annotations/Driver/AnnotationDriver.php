@@ -3,10 +3,11 @@
 namespace SoftRog\StatelessAuthBundle\Annotations\Driver;
 
 use Doctrine\Common\Annotations\Reader;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpFoundation\RequestStack;
 use SoftRog\StatelessAuth\Authentication;
+use SoftRog\StatelessAuthBundle\Exception\AuthorizationHeaderNotFoundException;
+use SoftRog\StatelessAuthBundle\Exception\InvalidAuthorizationException;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class AnnotationDriver
 {
@@ -48,22 +49,24 @@ class AnnotationDriver
 
     $class = new \ReflectionClass(get_class($controller[0])); // get controller
 
-    $this->handleStatelessAuth($class);
+    if (!empty($this->reader->getClassAnnotation($class, self::STATE_LESS_ANNOTATION))) {
+      $this->handleStatelessAuth($class);
+    }
   }
 
   protected function handleStatelessAuth($class)
   {
-    $annotation = $this->reader->getClassAnnotation($class, self::STATE_LESS_ANNOTATION);
-
     $request = $this->requestStack->getCurrentRequest();
     $headers = $request->headers->all();
     $token = $request->headers->get('Authorization');
 
-    if ($annotation && !$this->validator->validate($token, $headers)) {
-      throw new AccessDeniedHttpException('Invalid authentication');
+    if (empty($token)) {
+      throw new AuthorizationHeaderNotFoundException();
     }
 
-    return true;
+    if (!$this->validator->validate($token, $headers)) {
+      throw new InvalidAuthorizationException();
+    }
   }
 
 }

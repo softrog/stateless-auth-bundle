@@ -24,7 +24,7 @@ class AuthCommand extends ContainerAwareCommand
         'The headers that will be used in json',
         sprintf('{\'host\':\'%s\'}', gethostname())
       )
-      ->addOption('algorithm', 'a', InputArgument::OPTIONAL, '', 'sha256')
+      ->addOption('algorithm', 'a', InputOption::VALUE_OPTIONAL, '', 'sha256')
       ->addOption('num-first-iterations', 'f', InputOption::VALUE_OPTIONAL, '', 10)
       ->addOption('num-second-iterations', 'd', InputOption::VALUE_OPTIONAL, '', 10)
       ->addOption('num-final-iterations', 'l', InputOption::VALUE_OPTIONAL, '', 100)
