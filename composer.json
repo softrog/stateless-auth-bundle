@@ -10,7 +10,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "git@bitbucket.org:softrog/stateless-auth.git"
+            "url": "git@github.com:softrog/stateless-auth.git"
         }
     ],
     "autoload": {
