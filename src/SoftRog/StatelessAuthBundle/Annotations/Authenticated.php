@@ -6,6 +6,6 @@ namespace SoftRog\StatelessAuthBundle\Annotations;
  * @Annotation
  * @Target({"CLASS"})
  */
-class StatelessAuth
+class Authenticated
 {
 }

@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 class AnnotationDriver
 {
 
-  const STATE_LESS_ANNOTATION = 'SoftRog\StatelessAuthBundle\Annotations\StatelessAuth';
+  const STATE_LESS_ANNOTATION = 'SoftRog\StatelessAuthBundle\Annotations\Authenticated';
 
   /** @var Reader */
   private $reader;
@@ -50,11 +50,11 @@ class AnnotationDriver
     $class = new \ReflectionClass(get_class($controller[0])); // get controller
 
     if (!empty($this->reader->getClassAnnotation($class, self::STATE_LESS_ANNOTATION))) {
-      $this->handleStatelessAuth($class);
+      $this->handleAuthenticated($class);
     }
   }
 
-  protected function handleStatelessAuth($class)
+  protected function handleAuthenticated($class)
   {
     $request = $this->requestStack->getCurrentRequest();
     $headers = $request->headers->all();
